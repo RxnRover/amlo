@@ -1,0 +1,126 @@
+import unittest
+
+from amlro import generate_combos
+
+
+class TestConfigValidation(unittest.TestCase):
+
+    def test_max_bound_lt_min_bound(self):
+        """If the bounds are invalid, the function should say so.
+        """
+
+        config = {
+            "bounds": [[0, -1], [0, -1]],
+            "resolutions": [1, 1],
+            "feature_names": ["f1", "f2"],
+            "feature_count": 2
+        }
+
+        self.assertRaises(ValueError, generate_combos.validate_config,
+                          config)
+
+    def test_negative_resolution(self):
+        """Only positive resolutions make progress from the min to max bound,
+        so a negative resolution should be rejected.
+        """
+
+        config = {
+            "bounds": [[0, 1], [0, 1]],
+            "resolutions": [-1, 1],
+            "feature_names": ["f1", "f2"],
+            "feature_count": 2
+        }
+
+        self.assertRaises(ValueError, generate_combos.validate_config,
+                          config)
+
+    def test_zero_resolution(self):
+        """A resolution of zero would cause an infinite loop with no progress,
+        so it should not be accepted.
+        """
+
+        config = {
+            "bounds": [[0, 1], [0, 1]],
+            "resolutions": [0, 1],
+            "feature_names": ["f1", "f2"],
+            "feature_count": 2
+        }
+
+        self.assertRaises(ValueError, generate_combos.validate_config,
+                          config)
+
+
+class TestUniformGrid(unittest.TestCase):
+
+    def test_generate_uniform_grid_with_no_space_in_bounds(self):
+        """When the min and max bounds are equal, only one combo should
+        be generated.
+        """
+
+        config = {
+            "bounds": [[0, 0], [0, 0]],
+            "resolutions": [1, 1],
+            "feature_names": ["f1", "f2"],
+            "feature_count": 2
+        }
+
+        corr = [[0, 0]]
+
+        combo_list = generate_combos.generate_uniform_grid(config)
+
+        self.assertEqual(combo_list, corr)
+
+    def test_generate_uniform_grid_small_binary_grid(self):
+        """Test that a small grid of binary numbers can be generated."""
+
+        config = {
+            "bounds": [[0, 1], [0, 1]],
+            "resolutions": [1, 1],
+            "feature_names": ["f1", "f2"],
+            "feature_count": 2
+        }
+
+        corr = [[0, 0], [0, 1], [1, 0], [1, 1]]
+
+        combo_list = generate_combos.generate_uniform_grid(config)
+
+        self.assertEqual(combo_list, corr)
+
+    def test_generate_uniform_grid_larger_grid_with_nonintegers(self):
+        """Test that a larger grid with non-integer values, negative
+        bounds, and a resolution which the bounds are not divisible by can
+        be generated correctly."""
+
+        config = {
+            "bounds": [[0, 0.5], [-2, 2.5]],
+            "resolutions": [0.26, 0.5],
+            "feature_names": ["f1", "f2"],
+            "feature_count": 2
+        }
+
+        corr = [[0, -2],
+                [0, -1.5],
+                [0, -1.0],
+                [0, -0.5],
+                [0, 0.0],
+                [0, 0.5],
+                [0, 1.0],
+                [0, 1.5],
+                [0, 2.0],
+                [0, 2.5],
+                [0.26, -2],
+                [0.26, -1.5],
+                [0.26, -1.0],
+                [0.26, -0.5],
+                [0.26, 0.0],
+                [0.26, 0.5],
+                [0.26, 1.0],
+                [0.26, 1.5],
+                [0.26, 2.0],
+                [0.26, 2.5]]
+
+        combo_list = generate_combos.generate_uniform_grid(config)
+        for pair in combo_list:
+            print(pair)
+
+        self.assertEqual(combo_list, corr)
