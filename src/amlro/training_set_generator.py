@@ -8,6 +8,7 @@ def main():
     parameters = []
     yield_val = 0
     itr = 0
+
     next_parameters = generate_training_data(
         training_dataset_path, training_combo_path, parameters, yield_val, itr)
     print('Next experimental parameters for training set', next_parameters)
@@ -28,15 +29,15 @@ def generate_training_data(training_dataset_path, training_combo_path, parameter
     Returns:
         parameters (list) : parameter set for next experiment.
     """
-    prev_parameters = '2022/04/23 11:46:00' + ',' + \
-        str(yield_val) + ',' + ','.join([str(elem) for elem in parameters])
+    prev_parameters =  ','.join([str(elem) for elem in parameters]) + ',' + str(yield_val)
 
     if(len(parameters) != 0):
         optimizer.write_data_to_training(
             training_dataset_path, prev_parameters)
         print('writting')
     data = load_training_combo_file(training_combo_path)
-    print(data[itr])
+    
+    #print(data[itr])
     return data[itr]
 
 
