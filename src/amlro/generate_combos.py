@@ -2,6 +2,31 @@ from typing import List, Dict
 
 import math
 
+def validate_config(config: Dict) -> None:
+    """Validates the configuration dictionary for generating grids.
+
+    :param config: Configuration to be checked
+    :type config: Dict
+
+    :raises ValueError: At least one given bound is invalid.
+    :raises ValueError: At least one given resolution is invalid.
+    """
+
+    # Check for invalid bounds
+    for bound in config["bounds"]:
+        if (bound[0] > bound[1]):
+            msg =  "Max bound must be greater than or equal to the min "
+            msg += "bound. Given bounds: Min = {}, Max = {}".format(
+                bound[0], bound[1]
+            )
+            raise(ValueError(msg))
+
+    # Check for invalid resolutions
+    for resolution in config["resolutions"]:
+        if (resolution <= 0):
+            msg =  "Resolutions must all be positive, nonzero values. "
+            msg += "Given resolutions: {}".format(config["resolutions"])
+            raise(ValueError(msg))
 
 def get_next_combo(resolutions, bounds, curr_values, full_combo_list: List[List[float]], feature_idx: int) -> List[List[float]]:
     """_summary_
@@ -44,6 +69,8 @@ def generate_uniform_grid(config: Dict):
     Returns:
         _type_: _description_
     """
+
+    validate_config(config)
 
     # Initialize current values to lower bounds
     curr_values = [bound[0] for bound in config["bounds"]]
