@@ -31,15 +31,18 @@ def validate_config(config: Dict) -> None:
 def get_next_combo(resolutions, bounds, curr_values, full_combo_list: List[List[float]], feature_idx: int) -> List[List[float]]:
     """_summary_
 
-    Args:
-        resolutions (_type_): _description_
-        bounds (_type_): _description_
-        curr_values (_type_): _description_
-        full_combo_list (List[List[float]]): _description_
-        feature_idx (int): _description_
-
-    Returns:
-        List[List[float]]: _description_
+    :param resolutions: _description_
+    :type resolutions: _type_
+    :param bounds: _description_
+    :type bounds: _type_
+    :param curr_values: _description_
+    :type curr_values: _type_
+    :param full_combo_list: _description_
+    :type full_combo_list: List[List[float]]
+    :param feature_idx: _description_
+    :type feature_idx: int
+    :return: _description_
+    :rtype: List[List[float]]
     """
     tmp_values = [x for x in curr_values]
 
@@ -63,11 +66,10 @@ def get_next_combo(resolutions, bounds, curr_values, full_combo_list: List[List[
 def generate_uniform_grid(config: Dict):
     """_summary_
 
-    Args:
-        config (Dict): _description_
-
-    Returns:
-        _type_: _description_
+    :param config: _description_
+    :type config: Dict
+    :return: _description_
+    :rtype: _type_
     """
 
     validate_config(config)

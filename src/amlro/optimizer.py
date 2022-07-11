@@ -13,16 +13,16 @@ import sklearn.metrics as metrics
 
 class optimizer:
     def load_data(training_file, combination_file):
-        """ Loading the training set file and all combination file as pandas data frames and 
+        """Loading the training set file and all combination file as pandas data frames and 
         split into x train , y train and test datasets. When loading the combination file,
          data rows will be deleted if they include in training file.
 
-        Args:
-            training_file (File): path to the training set file
-            combination_file (File): path to the combination file
-
-        Returns:
-            Dataframe,Dataframe, Dataframe : x and y traning sets and test set
+        :param training_file: path to the training set file.
+        :type training_file: File
+        :param combination_file: path to the combination file
+        :type combination_file: File
+        :return: x and y traning datasets and test dataset
+        :rtype: Dataframe,Dataframe, Dataframe
         """
         train = pd.read_csv(training_file, skiprows=1)
         y_train = train['Yield']
@@ -39,14 +39,14 @@ class optimizer:
         return x_train, y_train, data
 
     def model_training(x_train, y_train):
-        """traning the regressor model and return the best model.
+        """ traning the regressor model and return the best model.
 
-        Args:
-            x_train (Dataframe): training dataframe 
-            y_train (Dataframe): target varible dataframe for training
-
-        Returns:
-            model: trained regressor model
+        :param x_train: training dataset.
+        :type x_train: Dataframe
+        :param y_train: target dataframe for training.
+        :type y_train: Dataframe
+        :return: trained regressor model
+        :rtype: model
         """
         kfold = KFold(n_splits=10, shuffle=True)
         # regr = RandomForestRegressor()#25 100
@@ -73,12 +73,12 @@ class optimizer:
         """predicting the yield from all the combination data using trained 
         regressor model and return the best combinations.
 
-        Args:
-            regr (model): trained regressor model
-            data (Dataframe): test dataset
-
-        Returns:
-            dataframe : best five predicted parameter set
+        :param regr: trained regressor model
+        :type regr: model
+        :param data: test dataset
+        :type data: Dataframe
+        :return: best five predicted parameter set
+        :rtype: Dataframe
         """
         pred = regr.predict(data)
         data['prediction'] = pred
@@ -90,12 +90,13 @@ class optimizer:
         return best_combo, data
 
     def write_data_to_training(training_file, prev_parameters):
-        """ writing the prev best predicted combination and 
+        """writing the prev best predicted combination and 
         experimental yield at the end of the training set file.
 
-        Args:
-            training_file (file): traning set file path
-            prev_parameters (string): previous best combo and yield
+        :param training_file: traning set file path
+        :type training_file: File
+        :param prev_parameters: previous best combo and yield
+        :type prev_parameters: String
         """
         # Open the file in append & read mode ('a+')
         with open(training_file, "a+") as file_object:

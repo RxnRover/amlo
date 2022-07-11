@@ -16,14 +16,16 @@ def get_optimized_parameters(training_dataset_path, full_combo_path, parameters=
     """getting the best parameter set from the maching learning optimizer. 
     Initialy experimental yield and previous parameter set should be empty.
 
-    Args:
-        training_dataset_path (file): file path to the training set file
-        full_combo_path ( file): file path to the combination file.
-        parameters (list, optional): previous best parameter set. Defaults to [].
-        yield_val (int, optional): previous experimental yield_. Defaults to 0.
-
-    Returns:
-        List : best parameter combination for next experiment
+    :param training_dataset_path: file path to the training set file.
+    :type training_dataset_path: File
+    :param full_combo_path: path to the combination file.
+    :type full_combo_path: File
+    :param parameters:  previous best parameter set, defaults to [].
+    :type parameters: list, optional
+    :param yield_val: previous experimental yield, defaults to 0.
+    :type yield_val: int, optional
+    :return: best parameter combination for next experiment
+    :rtype: List
     """
     prev_parameters = ','.join([str(elem)
                                for elem in parameters]) + ',' + str(yield_val)
