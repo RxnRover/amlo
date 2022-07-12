@@ -1,16 +1,35 @@
 from optimizer import optimizer
+import argparse
 
 
 def main():
-    training_dataset_path = '../../training.csv.txt'
-    full_combo_path = '../../training.csv.txt'
-    parameters = []
-    yield_val = 0
+    args = parse_args()
+
+    training_dataset_path = args.training_file
+    full_combo_path = args.full_combo_file
+    parameters = args.parameters
+    yield_val = float(args.yield_val)
+
+    parameters = [float(x) for x in parameters]
 
     best_combo = get_optimized_parameters(
         training_dataset_path, full_combo_path, parameters, yield_val)
     print('Optimized parameters ', best_combo)
 
+def parse_args() -> argparse.Namespace:
+    """Parse command line arguments"""
+
+    parser = argparse.ArgumentParser()
+
+    # Positional arguments
+    parser.add_argument("training_file", help="Training dataset file path")
+    parser.add_argument("full_combo_file", help="Full combination file path")
+    parser.add_argument(
+        "parameters", help="List of previous or initial parameters")
+    parser.add_argument(
+        "yield_val", help="Previous experimental value or initial zero")
+
+    return parser.parse_args()
 
 def get_optimized_parameters(training_dataset_path, full_combo_path, parameters=[], yield_val=0):
     """getting the best parameter set from the maching learning optimizer. 

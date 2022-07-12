@@ -1,17 +1,42 @@
 from optimizer import optimizer
 import pandas as pd
+import argparse
 
 
 def main():
-    training_dataset_path = '../../training.csv.txt'
-    training_combo_path = '../../training.csv.txt'
-    parameters = []
-    yield_val = 0
-    itr = 0
+
+    args = parse_args()
+
+    training_dataset_path = args.training_file
+    training_combo_path = args.training_combo_file
+    parameters = args.parameters
+    yield_val = float(args.yield_val)
+    itr = args.iteration
+
+    parameters = [float(x) for x in parameters]
 
     next_parameters = generate_training_data(
         training_dataset_path, training_combo_path, parameters, yield_val, itr)
+
     print('Next experimental parameters for training set', next_parameters)
+
+
+def parse_args() -> argparse.Namespace:
+    """Parse command line arguments"""
+
+    parser = argparse.ArgumentParser()
+
+    # Positional arguments
+    parser.add_argument("training_file", help="Training dataset file path")
+    parser.add_argument("training_combo_file", help="Training combo file path")
+    parser.add_argument(
+        "parameters", help="List of previous or initial parameters")
+    parser.add_argument(
+        "yield_val", help="Previous experimental value or initial zero")
+    parser.add_argument(
+        "iteration", help="Experiment step number, starting with zero", type=int)
+
+    return parser.parse_args()
 
 
 def generate_training_data(training_dataset_path, training_combo_path, parameters=[], yield_val=0, itr=0):
