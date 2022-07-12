@@ -26,7 +26,7 @@ class optimizer:
         """
         train = pd.read_csv(training_file, skiprows=1)
         y_train = train['Yield']
-        x_train = x_train.drop('Yield', axis=1)
+        x_train = train.drop('Yield', axis=1)
 
         data = pd.read_csv(combination_file, skiprows=1)
         data = data.drop('Yield', axis=1)
