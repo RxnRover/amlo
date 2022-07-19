@@ -2,6 +2,7 @@ from typing import List, Dict
 
 import math
 
+
 def validate_config(config: Dict) -> None:
     """Validates the configuration dictionary for generating grids.
 
@@ -15,7 +16,7 @@ def validate_config(config: Dict) -> None:
     # Check for invalid bounds
     for bound in config["bounds"]:
         if (bound[0] > bound[1]):
-            msg =  "Max bound must be greater than or equal to the min "
+            msg = "Max bound must be greater than or equal to the min "
             msg += "bound. Given bounds: Min = {}, Max = {}".format(
                 bound[0], bound[1]
             )
@@ -24,24 +25,25 @@ def validate_config(config: Dict) -> None:
     # Check for invalid resolutions
     for resolution in config["resolutions"]:
         if (resolution <= 0):
-            msg =  "Resolutions must all be positive, nonzero values. "
+            msg = "Resolutions must all be positive, nonzero values. "
             msg += "Given resolutions: {}".format(config["resolutions"])
             raise(ValueError(msg))
 
-def get_next_combo(resolutions, bounds, curr_values, full_combo_list: List[List[float]], feature_idx: int) -> List[List[float]]:
-    """_summary_
 
-    :param resolutions: _description_
-    :type resolutions: _type_
-    :param bounds: _description_
-    :type bounds: _type_
-    :param curr_values: _description_
-    :type curr_values: _type_
-    :param full_combo_list: _description_
+def get_next_combo(resolutions, bounds, curr_values, full_combo_list: List[List[float]], feature_idx: int) -> List[List[float]]:
+    """Recursive function to genereting all the parameter combinations. 
+
+    :param resolutions: Minimum resolution of parameter values.
+    :type resolutions: Float
+    :param bounds: Min and Max bounds for each parameter.
+    :type bounds: Float
+    :param curr_values: Current parameter value at each recursive cycle 
+    :type curr_values: Float
+    :param full_combo_list: All the parameter combinations.
     :type full_combo_list: List[List[float]]
-    :param feature_idx: _description_
+    :param feature_idx: Feature index from parameter list
     :type feature_idx: int
-    :return: _description_
+    :return: All the parameter combinations
     :rtype: List[List[float]]
     """
     tmp_values = [x for x in curr_values]
@@ -63,13 +65,13 @@ def get_next_combo(resolutions, bounds, curr_values, full_combo_list: List[List[
     return full_combo_list
 
 
-def generate_uniform_grid(config: Dict):
-    """_summary_
+def generate_uniform_grid(config: Dict) -> List[List[float]]:
+    """Genereting the parameter grid using the parameter bounds and their resulution.
 
-    :param config: _description_
+    :param config: Dictionary of parameters, their bounds and resulution.
     :type config: Dict
-    :return: _description_
-    :rtype: _type_
+    :return: List of all the parameter combinations within bounds.
+    :rtype: List[List[float]]
     """
 
     validate_config(config)
