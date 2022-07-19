@@ -1,3 +1,4 @@
+from ast import Str
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -9,18 +10,19 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.svm import SVR
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 import sklearn.metrics as metrics
+from typing import List, Dict
 
 
 class optimizer:
-    def load_data(training_file, combination_file):
+    def load_data(training_file: str, combination_file: Str):
         """Loading the training set file and all combination file as pandas data frames and 
         split into x train , y train and test datasets. When loading the combination file,
          data rows will be deleted if they include in training file.
 
         :param training_file: path to the training set file.
-        :type training_file: File
+        :type training_file: Str
         :param combination_file: path to the combination file
-        :type combination_file: File
+        :type combination_file: Str
         :return: x and y traning datasets and test dataset
         :rtype: Dataframe,Dataframe, Dataframe
         """
@@ -38,7 +40,7 @@ class optimizer:
 
         return x_train, y_train, data
 
-    def model_training(x_train, y_train):
+    def model_training(x_train: pd.DataFrame, y_train: pd.DataFrame):
         """ traning the regressor model and return the best model.
 
         :param x_train: training dataset.
@@ -69,7 +71,7 @@ class optimizer:
 
         return regr
 
-    def predict_next_parameters(regr, data):
+    def predict_next_parameters(regr, data: pd.DataFrame) -> pd.DataFrame:
         """predicting the yield from all the combination data using trained 
         regressor model and return the best combinations.
 
@@ -87,16 +89,16 @@ class optimizer:
         best_combo = data.sort_values(
             by=['prediction'], ascending=False).iloc[:5]
 
-        return best_combo, data
+        return best_combo
 
-    def write_data_to_training(training_file, prev_parameters):
+    def write_data_to_training(training_file: str, prev_parameters: Str):
         """writing the prev best predicted combination and 
         experimental yield at the end of the training set file.
 
         :param training_file: traning set file path
-        :type training_file: File
+        :type training_file: Str
         :param prev_parameters: previous best combo and yield
-        :type prev_parameters: String
+        :type prev_parameters: Str
         """
         # Open the file in append & read mode ('a+')
         with open(training_file, "a+") as file_object:

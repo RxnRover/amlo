@@ -1,6 +1,8 @@
+from ast import Str
 from optimizer import optimizer
 import pandas as pd
 import argparse
+from typing import List, Dict
 
 
 def main():
@@ -39,15 +41,15 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def generate_training_data(training_dataset_path, training_combo_path, parameters=[], yield_val=0, itr=0):
+def generate_training_data(training_dataset_path: Str, training_combo_path: Str, parameters=[], yield_val=0, itr=0)-> List[float]:
     """Generating traning dataset for the ML model. This function is reading reaction parameters from 
     tranining combination file and return next  reaction parameter combination. After the first experiment, 
     previous parameter set and experimental yield are writting to the traning set file.
 
     :param training_dataset_path: Path to the traning dataset file.
-    :type training_dataset_path: File
+    :type training_dataset_path: Str
     :param training_combo_path: path to the traning combination file.
-    :type training_combo_path: File
+    :type training_combo_path: Str
     :param parameters: parameter set from previous experiment or initial parameters, defaults to [].
     :type parameters: List, optional
     :param yield_val: experimental yield from previous experiment, defaults to 0.
@@ -70,13 +72,13 @@ def generate_training_data(training_dataset_path, training_combo_path, parameter
     return data[itr]
 
 
-def load_training_combo_file(training_combo):
+def load_training_combo_file(training_combo: Str)-> List[float]:
     """loading the training combination file as pandas data frame and return combination data as list.
 
     :param training_combo: training parameter combination file path
-    :type training_combo: File
+    :type training_combo: Str
     :return: training parameter combination list
-    :rtype: List
+    :rtype: List[float]
     """
     data = pd.read_csv(training_combo, skiprows=1)
     return data.values.tolist()
