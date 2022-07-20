@@ -20,9 +20,9 @@ class optimizer:
          data rows will be deleted if they include in training file.
 
         :param training_file: path to the training set file.
-        :type training_file: Str
+        :type training_file: str
         :param combination_file: path to the combination file
-        :type combination_file: Str
+        :type combination_file: str
         :return: x and y traning datasets and test dataset
         :rtype: Dataframe,Dataframe, Dataframe
         """
@@ -96,9 +96,9 @@ class optimizer:
         experimental yield at the end of the training set file.
 
         :param training_file: traning set file path
-        :type training_file: Str
+        :type training_file: str
         :param prev_parameters: previous best combo and yield
-        :type prev_parameters: Str
+        :type prev_parameters: str
         """
         # Open the file in append & read mode ('a+')
         with open(training_file, "a+") as file_object:

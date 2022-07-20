@@ -47,9 +47,9 @@ def generate_training_data(training_dataset_path: Str, training_combo_path: Str,
     previous parameter set and experimental yield are writting to the traning set file.
 
     :param training_dataset_path: Path to the traning dataset file.
-    :type training_dataset_path: Str
+    :type training_dataset_path: str
     :param training_combo_path: path to the traning combination file.
-    :type training_combo_path: Str
+    :type training_combo_path: str
     :param parameters: parameter set from previous experiment or initial parameters, defaults to [].
     :type parameters: List, optional
     :param yield_val: experimental yield from previous experiment, defaults to 0.
@@ -76,7 +76,7 @@ def load_training_combo_file(training_combo: Str)-> List[float]:
     """loading the training combination file as pandas data frame and return combination data as list.
 
     :param training_combo: training parameter combination file path
-    :type training_combo: Str
+    :type training_combo: str
     :return: training parameter combination list
     :rtype: List[float]
     """

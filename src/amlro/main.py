@@ -37,11 +37,11 @@ def get_optimized_parameters(training_dataset_path: str, full_combo_path: str, p
     Initialy experimental yield and previous parameter set should be empty.
 
     :param training_dataset_path: file path to the training set file.
-    :type training_dataset_path: Str
+    :type training_dataset_path: str
     :param full_combo_path: path to the combination file.
-    :type full_combo_path: Str
+    :type full_combo_path: str
     :param parameters:  previous best parameter set, defaults to [].
-    :type parameters: list, optional
+    :type parameters: List[float], optional
     :param yield_val: previous experimental yield, defaults to 0.
     :type yield_val: int, optional
     :return: best parameter combination for next experiment

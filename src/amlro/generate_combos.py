@@ -34,11 +34,11 @@ def get_next_combo(resolutions, bounds, curr_values, full_combo_list: List[List[
     """Recursive function to genereting all the parameter combinations. 
 
     :param resolutions: Minimum resolution of parameter values.
-    :type resolutions: Float
+    :type resolutions: float
     :param bounds: Min and Max bounds for each parameter.
-    :type bounds: Float
+    :type bounds: float
     :param curr_values: Current parameter value at each recursive cycle 
-    :type curr_values: Float
+    :type curr_values: float
     :param full_combo_list: All the parameter combinations.
     :type full_combo_list: List[List[float]]
     :param feature_idx: Feature index from parameter list
@@ -66,9 +66,9 @@ def get_next_combo(resolutions, bounds, curr_values, full_combo_list: List[List[
 
 
 def generate_uniform_grid(config: Dict) -> List[List[float]]:
-    """Genereting the parameter grid using the parameter bounds and their resulution.
+    """Genereting the parameter grid using the parameter bounds and their resolution.
 
-    :param config: Dictionary of parameters, their bounds and resulution.
+    :param config: Dictionary of parameters, their bounds and resolution.
     :type config: Dict
     :return: List of all the parameter combinations within bounds.
     :rtype: List[List[float]]
