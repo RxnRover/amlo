@@ -10,13 +10,17 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.svm import SVR
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 import sklearn.metrics as metrics
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 
 class optimizer:
-    def load_data(training_file: str, combination_file: Str):
-        """Loading the training set file and all combination file as pandas data frames and 
-        split into x train , y train and test datasets. When loading the combination file,
+
+    def load_data(
+        training_file: str, combination_file: Str
+    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        """Loading the training set file and all combination
+         file as pandas data frames and split into x train , 
+         y train and test datasets. When loading the combination file,
          data rows will be deleted if they include in training file.
 
         :param training_file: path to the training set file.
@@ -35,8 +39,8 @@ class optimizer:
 
         data = data.drop_duplicates()
         #data = pd.concat([data,x_train]).drop_duplicates(keep=False).dropna()
-        data = data.loc[~data.index.isin(data.merge(
-            x_train.assign(a='key'), how='left').dropna().index)]
+        data = data.loc[~data.index.isin(
+            data.merge(x_train.assign(a='key'), how='left').dropna().index)]
 
         return x_train, y_train, data
 
@@ -57,16 +61,20 @@ class optimizer:
         #regr = SVR()
 
         estimators_int = list(range(100, 1000, 50))
-        param_grid = {'n_estimators': estimators_int,
-                      'max_depth': [None, 2, 4]}
+        param_grid = {
+            'n_estimators': estimators_int,
+            'max_depth': [None, 2, 4]
+        }
         #param_grid = {'n_estimators': estimators_int, 'loss': ['linear','square', 'exponentia']}
         #param_grid = {'kernel': ['linear','poly', 'rbf','sigmoid'], 'epsilon':[0.1,0.01,0.05]}
-        grid = GridSearchCV(
-            estimator=regr, param_grid=param_grid, cv=kfold, n_jobs=6)
+        grid = GridSearchCV(estimator=regr,
+                            param_grid=param_grid,
+                            cv=kfold,
+                            n_jobs=6)
 
         grid_result = grid.fit(x_train, y_train)
-        best_params = pd.DataFrame(
-            [grid.best_params_], columns=grid.best_params_.keys())
+        best_params = pd.DataFrame([grid.best_params_],
+                                   columns=grid.best_params_.keys())
         regr = grid.best_estimator_
 
         return regr
@@ -86,12 +94,13 @@ class optimizer:
         data['prediction'] = pred
         # print(data)
 
-        best_combo = data.sort_values(
-            by=['prediction'], ascending=False).iloc[:5]
+        best_combo = data.sort_values(by=['prediction'],
+                                      ascending=False).iloc[:5]
 
         return best_combo
 
-    def write_data_to_training(training_file: str, prev_parameters: Str):
+    def write_data_to_training(training_file: str,
+                               prev_parameters: Str) -> None:
         """writing the prev best predicted combination and 
         experimental yield at the end of the training set file.
 

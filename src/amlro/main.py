@@ -13,9 +13,11 @@ def main():
 
     parameters = [float(x) for x in parameters]
 
-    best_combo = get_optimized_parameters(
-        training_dataset_path, full_combo_path, parameters, yield_val)
+    best_combo = get_optimized_parameters(training_dataset_path,
+                                          full_combo_path, parameters,
+                                          yield_val)
     print('Optimized parameters ', best_combo)
+
 
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments"""
@@ -25,14 +27,18 @@ def parse_args() -> argparse.Namespace:
     # Positional arguments
     parser.add_argument("training_file", help="Training dataset file path")
     parser.add_argument("full_combo_file", help="Full combination file path")
-    parser.add_argument(
-        "parameters", help="List of previous or initial parameters")
-    parser.add_argument(
-        "yield_val", help="Previous experimental value or initial zero")
+    parser.add_argument("parameters",
+                        help="List of previous or initial parameters")
+    parser.add_argument("yield_val",
+                        help="Previous experimental value or initial zero")
 
     return parser.parse_args()
 
-def get_optimized_parameters(training_dataset_path: str, full_combo_path: str, parameters=[], yield_val=0)-> List[float]:
+
+def get_optimized_parameters(training_dataset_path: str,
+                             full_combo_path: str,
+                             parameters=[],
+                             yield_val=0) -> List[float]:
     """getting the best parameter set from the maching learning optimizer. 
     Initialy experimental yield and previous parameter set should be empty.
 
@@ -48,15 +54,15 @@ def get_optimized_parameters(training_dataset_path: str, full_combo_path: str, p
     :rtype: List[float]
     """
     prev_parameters = ','.join([str(elem)
-                               for elem in parameters]) + ',' + str(yield_val)
+                                for elem in parameters]) + ',' + str(yield_val)
 
-    if(len(parameters) != 0):
-        optimizer.write_data_to_training(
-            training_dataset_path, prev_parameters)
+    if (len(parameters) != 0):
+        optimizer.write_data_to_training(training_dataset_path,
+                                         prev_parameters)
         print('writting')
     ####################################################
-    x_train, y_train, data = optimizer.load_data(
-        training_dataset_path, full_combo_path)
+    x_train, y_train, data = optimizer.load_data(training_dataset_path,
+                                                 full_combo_path)
     print('Data Loading for Machine Learning Model...')
     # print(data)
 
