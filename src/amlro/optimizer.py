@@ -1,4 +1,3 @@
-from ast import Str
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -16,7 +15,7 @@ from typing import List, Dict, Tuple
 class optimizer:
 
     def load_data(
-        training_file: str, combination_file: Str
+        training_file: str, combination_file: str
     ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """Loading the training set file and all combination
          file as pandas data frames and split into x train , 
@@ -100,7 +99,7 @@ class optimizer:
         return best_combo
 
     def write_data_to_training(training_file: str,
-                               prev_parameters: Str) -> None:
+                               prev_parameters: str) -> None:
         """writing the prev best predicted combination and 
         experimental yield at the end of the training set file.
 

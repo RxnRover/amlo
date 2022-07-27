@@ -43,8 +43,8 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def generate_training_data(training_dataset_path: Str,
-                           training_combo_path: Str,
+def generate_training_data(training_dataset_path: str,
+                           training_combo_path: str,
                            parameters=[],
                            yield_val=0,
                            itr=0) -> List[float]:
@@ -80,7 +80,7 @@ def generate_training_data(training_dataset_path: Str,
     return data[itr]
 
 
-def load_training_combo_file(training_combo: Str) -> List[float]:
+def load_training_combo_file(training_combo: str) -> List[float]:
     """loading the training combination file as pandas data frame and 
     return combination data as list.
 
