@@ -80,7 +80,6 @@ def generate_uniform_grid(config: Dict) -> List[List[float]]:
 
     # Initialize current values to lower bounds
     curr_values = [bound[0] for bound in config["bounds"]]
-    print("Initial values: {}".format(curr_values))
 
     return get_next_combo(config["resolutions"], config["bounds"], curr_values,
                           [], 0)
