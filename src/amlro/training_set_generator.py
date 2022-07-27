@@ -76,7 +76,7 @@ def generate_training_data(training_dataset_path: str,
         print('writting')
     data = load_training_combo_file(training_combo_path)
 
-    # print(data[itr])
+    
     return data[itr]
 
 

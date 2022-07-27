@@ -64,7 +64,7 @@ def get_optimized_parameters(training_dataset_path: str,
     x_train, y_train, data = optimizer.load_data(training_dataset_path,
                                                  full_combo_path)
     print('Data Loading for Machine Learning Model...')
-    # print(data)
+    
 
     print('Training ML model...')
     regr = optimizer.model_training(x_train, y_train)

@@ -91,7 +91,7 @@ class optimizer:
         """
         pred = regr.predict(data)
         data['prediction'] = pred
-        # print(data)
+        
 
         best_combo = data.sort_values(by=['prediction'],
                                       ascending=False).iloc[:5]
@@ -111,4 +111,4 @@ class optimizer:
         # Open the file in append & read mode ('a+')
         with open(training_file, "a+") as file_object:
             file_object.write(prev_parameters + '\n')
-            # file_object.close()
+            
