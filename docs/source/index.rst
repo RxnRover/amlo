@@ -10,6 +10,7 @@ Welcome to AMLRO's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   API <api/amlro>
 
 
 Indices and tables
