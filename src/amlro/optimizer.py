@@ -29,17 +29,17 @@ class optimizer:
         :return: x and y traning datasets and test dataset
         :rtype: Dataframe,Dataframe, Dataframe
         """
-        train = pd.read_csv(training_file, skiprows=1)
+        train = pd.read_csv(training_file, skiprows=0)
         y_train = train['Yield']
         x_train = train.drop('Yield', axis=1)
 
-        data = pd.read_csv(combination_file, skiprows=1)
-        data = data.drop('Yield', axis=1)
+        data = pd.read_csv(combination_file, skiprows=0)
+        
 
         data = data.drop_duplicates()
         #data = pd.concat([data,x_train]).drop_duplicates(keep=False).dropna()
-        data = data.loc[~data.index.isin(
-            data.merge(x_train.assign(a='key'), how='left').dropna().index)]
+        #data = data.loc[~data.index.isin(
+           # data.merge(x_train.assign(a='key'), how='left').dropna().index)]
 
         return x_train, y_train, data
 
@@ -95,6 +95,7 @@ class optimizer:
 
         best_combo = data.sort_values(by=['prediction'],
                                       ascending=False).iloc[:5]
+        best_combo = best_combo.drop('prediction',axis=1)
 
         return best_combo
 

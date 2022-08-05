@@ -1,5 +1,4 @@
-from ast import Str
-from optimizer import optimizer
+from amlro.optimizer import optimizer
 import pandas as pd
 import argparse
 from typing import List, Dict
@@ -69,11 +68,13 @@ def generate_training_data(training_dataset_path: str,
     """
     prev_parameters = ','.join([str(elem)
                                 for elem in parameters]) + ',' + str(yield_val)
-
-    if (len(parameters) != 0):
+    
+    if (itr != 0):
+        
         optimizer.write_data_to_training(training_dataset_path,
                                          prev_parameters)
         print('writting')
+    
     data = load_training_combo_file(training_combo_path)
 
     
@@ -89,7 +90,7 @@ def load_training_combo_file(training_combo: str) -> List[float]:
     :return: training parameter combination list
     :rtype: List[float]
     """
-    data = pd.read_csv(training_combo, skiprows=1)
+    data = pd.read_csv(training_combo, skiprows=0)
     return data.values.tolist()
 
 
