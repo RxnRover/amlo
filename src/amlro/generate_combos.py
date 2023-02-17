@@ -31,7 +31,8 @@ def validate_config(config: Dict) -> None:
 
 
 def get_combos(features: List[List[Any]]) -> List[List[Any]]:
-    """Generates all combinations of the values for the features given.
+    """Generates all combinations of the values for the features given. The
+    order of the combinations is not guaranteed by this function.
 
     :param features: Discretized features to generate combinations of, with
                      one feature per row.
@@ -52,7 +53,12 @@ def _get_next_combo(
 ) -> List[List[Any]]:
     """Internal implementation for the recursive function to generate all
     combinations for a given set of discretized features. This helps to hide
-    the extra defaulted parameters from the user.
+    the extra parameters from the user.
+
+    This implementation will iterate over the features with the first feature
+    moving slowest and the last feature moving fastest in the generated
+    combinations. This means combinations for the features [0, 1] and [1, 2]
+    will be generated in the following order: [0, 1], [0, 2], [1, 1], [1, 2].
 
     :param features: Discretized features to generate combinations of, with
                      one feature per row.
@@ -81,6 +87,8 @@ def _get_next_combo(
         full_combo_list.append(tmp_combo)
         return full_combo_list
 
+    # Loop over each value of the current feature, adding it to the current
+    # combination and passing it to the next parameter
     for value in features[feature_idx]:
         tmp_combo.append(value)
 
@@ -125,6 +133,8 @@ def generate_uniform_grid(config: Dict) -> List[List[float]]:
         continuous_features.append(feature)
 
     features = continuous_features
+
+    # TODO: Support categorical variables as well, appending them here
 
     return get_combos(features)
 
