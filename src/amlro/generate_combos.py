@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import Any, Dict, List
 
 import math
 
@@ -14,55 +14,91 @@ def validate_config(config: Dict) -> None:
     """
 
     # Check for invalid bounds
-    for bound in config["bounds"]:
-        if (bound[0] > bound[1]):
+    for bound in config["continuous"]["bounds"]:
+        if bound[0] > bound[1]:
             msg = "Max bound must be greater than or equal to the min "
             msg += "bound. Given bounds: Min = {}, Max = {}".format(
-                bound[0], bound[1])
+                bound[0], bound[1]
+            )
             raise (ValueError(msg))
 
     # Check for invalid resolutions
-    for resolution in config["resolutions"]:
-        if (resolution <= 0):
+    for resolution in config["continuous"]["resolutions"]:
+        if resolution <= 0:
             msg = "Resolutions must all be positive, nonzero values. "
-            msg += "Given resolutions: {}".format(config["resolutions"])
+            msg += "Given resolutions: {}".format(
+                config["continuous"]["resolutions"]
+            )
             raise (ValueError(msg))
 
 
-def get_next_combo(resolutions, bounds, curr_values,
-                   full_combo_list: List[List[float]],
-                   feature_idx: int) -> List[List[float]]:
-    """Recursive function to genereting all the parameter combinations. 
+def get_combos(features: List[List[Any]]) -> List[List[Any]]:
+    """Generates all combinations of the values for the features given. The
+    order of the combinations is not guaranteed by this function.
 
-    :param resolutions: Minimum resolution of parameter values.
-    :type resolutions: float
-    :param bounds: Min and Max bounds for each parameter.
-    :type bounds: float
-    :param curr_values: Current parameter value at each recursive cycle 
-    :type curr_values: float
-    :param full_combo_list: All the parameter combinations.
-    :type full_combo_list: List[List[float]]
-    :param feature_idx: Feature index from parameter list
-    :type feature_idx: int
-    :return: All the parameter combinations
-    :rtype: List[List[float]]
+    :param features: Discretized features to generate combinations of, with
+                     one feature per row.
+    :type features: List[List[Any]]
+
+    :return: All combinations of the features, with one combination per row.
+    :rtype: List[List[Any]]
     """
-    tmp_values = [x for x in curr_values]
 
-    if (feature_idx >= len(tmp_values)):
-        tmp_value = [x for x in tmp_values]
-        full_combo_list.append(tmp_value)
+    return _get_next_combo(features, [], [], 0)
+
+
+def _get_next_combo(
+    features: List[List[Any]],
+    curr_combo: List[Any],
+    full_combo_list: List[List[Any]],
+    feature_idx: int,
+) -> List[List[Any]]:
+    """Internal implementation for the recursive function to generate all
+    combinations for a given set of discretized features. This helps to hide
+    the extra parameters from the user.
+
+    This implementation will iterate over the features with the first feature
+    moving slowest and the last feature moving fastest in the generated
+    combinations. This means combinations for the features [0, 1] and [1, 2]
+    will be generated in the following order: [0, 1], [0, 2], [1, 1], [1, 2].
+
+    :param features: Discretized features to generate combinations of, with
+                     one feature per row.
+    :type features: List[List[Any]]
+    :param curr_combo: Current combination being generated. In the initial
+                       call this should be an empty list ([])
+    :type curr_combo: List[Any], optional
+    :param full_combo_list: Full list of combinations. In the initial
+                       call this should be an empty list ([])
+    :type full_combo_list: List[List[float]], optional
+    :param feature_idx: Current feature index. In the initial
+                       call this should be zero (0)
+    :type feature_idx: int
+
+    :return: All combinations of the features, with one combination per row.
+    :rtype: List[List[Any]]
+    """
+
+    # Make a copy of the curr_combo list
+    tmp_combo = [x for x in curr_combo]
+
+    # Base case
+    # We have passed the last feature and a full combination has been
+    # generated.
+    if feature_idx >= len(features):
+        full_combo_list.append(tmp_combo)
         return full_combo_list
 
-    # Reset current feature value to minimum
-    tmp_values[feature_idx] = bounds[feature_idx][0]
+    # Loop over each value of the current feature, adding it to the current
+    # combination and passing it to the next parameter
+    for value in features[feature_idx]:
+        tmp_combo.append(value)
 
-    while (math.isclose(tmp_values[feature_idx], bounds[feature_idx][1])
-           or tmp_values[feature_idx] < bounds[feature_idx][1]):
-        full_combo_list = get_next_combo(resolutions, bounds, tmp_values,
-                                         full_combo_list, feature_idx + 1)
+        full_combo_list = _get_next_combo(
+            features, tmp_combo, full_combo_list, feature_idx + 1
+        )
 
-        tmp_values[feature_idx] += resolutions[feature_idx]
+        del tmp_combo[-1]
 
     return full_combo_list
 
@@ -78,11 +114,33 @@ def generate_uniform_grid(config: Dict) -> List[List[float]]:
 
     validate_config(config)
 
-    # Initialize current values to lower bounds
-    curr_values = [bound[0] for bound in config["bounds"]]
+    features = []
 
-    return get_next_combo(config["resolutions"], config["bounds"], curr_values,
-                          [], 0)
+    if "categorical" in config and len(config["categorical"]):
+        for i in range(len(config["categorical"]["feature_names"])):
+            config["continuous"]["feature_names"].append(config["categorical"]["feature_names"][i])
+            config["continuous"]["bounds"].append([0, len(config["categorical"]["values"][i]) - 1])
+            config["continuous"]["resolutions"].append(1)
+
+    for i in range(len(config["continuous"]["bounds"])):
+        lower_bound = config["continuous"]["bounds"][i][0]
+        upper_bound = config["continuous"]["bounds"][i][1]
+
+        feature = []
+
+        next_value = lower_bound
+
+        # This while condition is essentially `while (next_value <= upper_bound)`,
+        # but math.isclose() is used to account for slight variation in stored
+        # float values (0.3 might be stored as 0.30000000000000004)
+        while next_value < upper_bound or math.isclose(next_value, upper_bound):
+            feature.append(next_value)
+
+            next_value += config["continuous"]["resolutions"][i]
+
+        features.append(feature)
+
+    return get_combos(features)
 
 
 def optimizer_iteration(full_combo, training_set, parameters=[], rxn_yield=0):
@@ -90,12 +148,16 @@ def optimizer_iteration(full_combo, training_set, parameters=[], rxn_yield=0):
 
 
 def main():
-
     config = {
-        "bounds": [[0, 0.3], [0, 0.3], [-10, 20]],
-        "resolutions": [0.1, 0.1, 5],
-        "feature_names": ["f1", "f2", "f3"],
-        "feature_count": 3
+        "continuous": {
+            "feature_names": ["f1", "f2", "f3"],
+            "bounds": [[0, 0.3], [0, 0.3], [-10, 20]],
+            "resolutions": [0.1, 0.1, 5],
+        },
+        "categorical": {
+            "feature_names": ["animal", "color"],
+            "values": [["cat", "dog"], ["brown", "black", "yellow"]],
+        },
     }
 
     full_combo_list = generate_uniform_grid(config)
@@ -105,5 +167,4 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()
