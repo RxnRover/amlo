@@ -4,14 +4,16 @@ from amlro import generate_combos
 
 
 class TestConfigValidation(unittest.TestCase):
+
     def test_max_bound_lt_min_bound(self):
         """If the bounds are invalid, the function should say so."""
 
         config = {
-            "bounds": [[0, -1], [0, -1]],
-            "resolutions": [1, 1],
-            "feature_names": ["f1", "f2"],
-            "feature_count": 2,
+            "continuous": {
+                "bounds": [[0, -1], [0, -1]],
+                "resolutions": [1, 1],
+                "feature_names": ["f1", "f2"],
+            }
         }
 
         self.assertRaises(ValueError, generate_combos.validate_config, config)
@@ -22,10 +24,11 @@ class TestConfigValidation(unittest.TestCase):
         """
 
         config = {
-            "bounds": [[0, 1], [0, 1]],
-            "resolutions": [-1, 1],
-            "feature_names": ["f1", "f2"],
-            "feature_count": 2,
+            "continuous": {
+                "bounds": [[0, 1], [0, 1]],
+                "resolutions": [-1, 1],
+                "feature_names": ["f1", "f2"],
+            }
         }
 
         self.assertRaises(ValueError, generate_combos.validate_config, config)
@@ -36,16 +39,18 @@ class TestConfigValidation(unittest.TestCase):
         """
 
         config = {
-            "bounds": [[0, 1], [0, 1]],
-            "resolutions": [0, 1],
-            "feature_names": ["f1", "f2"],
-            "feature_count": 2,
+            "continuous": {
+                "bounds": [[0, 1], [0, 1]],
+                "resolutions": [0, 1],
+                "feature_names": ["f1", "f2"],
+            }
         }
 
         self.assertRaises(ValueError, generate_combos.validate_config, config)
 
 
-class TestGenerateNextCombo(unittest.TestCase):
+class TestGetCombos(unittest.TestCase):
+
     def test_small_list(self):
         features = [[0, 1], [0, 1]]
 
@@ -91,16 +96,18 @@ class TestGenerateNextCombo(unittest.TestCase):
 
 
 class TestUniformGrid(unittest.TestCase):
+
     def test_generate_uniform_grid_with_no_space_in_bounds(self):
         """When the min and max bounds are equal, only one combo should
         be generated.
         """
 
         config = {
-            "bounds": [[0, 0], [0, 0]],
-            "resolutions": [1, 1],
-            "feature_names": ["f1", "f2"],
-            "feature_count": 2,
+            "continuous": {
+                "bounds": [[0, 0], [0, 0]],
+                "resolutions": [1, 1],
+                "feature_names": ["f1", "f2"],
+            },
         }
 
         corr = [[0, 0]]
@@ -113,10 +120,11 @@ class TestUniformGrid(unittest.TestCase):
         """Test that a small grid of binary numbers can be generated."""
 
         config = {
-            "bounds": [[0, 1], [0, 1]],
-            "resolutions": [1, 1],
-            "feature_names": ["f1", "f2"],
-            "feature_count": 2,
+            "continuous": {
+                "bounds": [[0, 1], [0, 1]],
+                "resolutions": [1, 1],
+                "feature_names": ["f1", "f2"],
+            }
         }
 
         corr = [[0, 0], [0, 1], [1, 0], [1, 1]]
@@ -131,10 +139,11 @@ class TestUniformGrid(unittest.TestCase):
         be generated correctly."""
 
         config = {
-            "bounds": [[0, 0.5], [-2, 2.5]],
-            "resolutions": [0.26, 0.5],
-            "feature_names": ["f1", "f2"],
-            "feature_count": 2,
+            "continuous": {
+                "bounds": [[0, 0.5], [-2, 2.5]],
+                "resolutions": [0.26, 0.5],
+                "feature_names": ["f1", "f2"],
+            }
         }
 
         corr = [
@@ -163,5 +172,27 @@ class TestUniformGrid(unittest.TestCase):
         combo_list = generate_combos.generate_uniform_grid(config)
         for pair in combo_list:
             print(pair)
+
+        self.assertEqual(combo_list, corr)
+
+    def test_generate_uniform_grid_mixed_variables(self):
+        """Test that a small grid of binary numbers can be generated."""
+
+        config = {
+            "continuous": {
+                "bounds": [[0, 1], [0, 1]],
+                "resolutions": [1, 1],
+                "feature_names": ["f1", "f2"],
+            },
+            "categorical": {
+                "feature_names": ["animal"],
+                "values": [["cat", "dog"]]
+            }
+        }
+
+        corr = [[0, 0, 0], [0, 0, 1], [0, 1, 0], [0, 1, 1],
+                [1, 0, 0], [1, 0, 1], [1, 1, 0], [1, 1, 1]]
+
+        combo_list = generate_combos.generate_uniform_grid(config)
 
         self.assertEqual(combo_list, corr)

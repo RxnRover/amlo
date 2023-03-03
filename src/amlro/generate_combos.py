@@ -14,7 +14,7 @@ def validate_config(config: Dict) -> None:
     """
 
     # Check for invalid bounds
-    for bound in config["bounds"]:
+    for bound in config["continuous"]["bounds"]:
         if bound[0] > bound[1]:
             msg = "Max bound must be greater than or equal to the min "
             msg += "bound. Given bounds: Min = {}, Max = {}".format(
@@ -23,10 +23,12 @@ def validate_config(config: Dict) -> None:
             raise (ValueError(msg))
 
     # Check for invalid resolutions
-    for resolution in config["resolutions"]:
+    for resolution in config["continuous"]["resolutions"]:
         if resolution <= 0:
             msg = "Resolutions must all be positive, nonzero values. "
-            msg += "Given resolutions: {}".format(config["resolutions"])
+            msg += "Given resolutions: {}".format(
+                config["continuous"]["resolutions"]
+            )
             raise (ValueError(msg))
 
 
@@ -112,29 +114,31 @@ def generate_uniform_grid(config: Dict) -> List[List[float]]:
 
     validate_config(config)
 
-    continuous_features = []
+    features = []
 
-    for i in range(len(config["bounds"])):
-        lower_bound = config["bounds"][i][0]
-        upper_bound = config["bounds"][i][1]
+    if "categorical" in config and len(config["categorical"]):
+        for i in range(len(config["categorical"]["feature_names"])):
+            config["continuous"]["feature_names"].append(config["categorical"]["feature_names"][i])
+            config["continuous"]["bounds"].append([0, len(config["categorical"]["values"][i]) - 1])
+            config["continuous"]["resolutions"].append(1)
+
+    for i in range(len(config["continuous"]["bounds"])):
+        lower_bound = config["continuous"]["bounds"][i][0]
+        upper_bound = config["continuous"]["bounds"][i][1]
 
         feature = []
 
         next_value = lower_bound
 
-        # while (next_value <= upper_bound), but math.isclose() is used to
-        # account for slight variation in storing float values (0.3 might be
-        # stored as 0.30000000000000004)
+        # This while condition is essentially `while (next_value <= upper_bound)`,
+        # but math.isclose() is used to account for slight variation in stored
+        # float values (0.3 might be stored as 0.30000000000000004)
         while next_value < upper_bound or math.isclose(next_value, upper_bound):
             feature.append(next_value)
 
-            next_value += config["resolutions"][i]
+            next_value += config["continuous"]["resolutions"][i]
 
-        continuous_features.append(feature)
-
-    features = continuous_features
-
-    # TODO: Support categorical variables as well, appending them here
+        features.append(feature)
 
     return get_combos(features)
 
@@ -145,10 +149,15 @@ def optimizer_iteration(full_combo, training_set, parameters=[], rxn_yield=0):
 
 def main():
     config = {
-        "bounds": [[0, 0.3], [0, 0.3], [-10, 20]],
-        "resolutions": [0.1, 0.1, 5],
-        "feature_names": ["f1", "f2", "f3"],
-        "feature_count": 3,
+        "continuous": {
+            "feature_names": ["f1", "f2", "f3"],
+            "bounds": [[0, 0.3], [0, 0.3], [-10, 20]],
+            "resolutions": [0.1, 0.1, 5],
+        },
+        "categorical": {
+            "feature_names": ["animal", "color"],
+            "values": [["cat", "dog"], ["brown", "black", "yellow"]],
+        },
     }
 
     full_combo_list = generate_uniform_grid(config)
