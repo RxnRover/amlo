@@ -34,12 +34,11 @@ class optimizer:
         x_train = train.drop('Yield', axis=1)
 
         data = pd.read_csv(combination_file, skiprows=0)
-        
 
         data = data.drop_duplicates()
         #data = pd.concat([data,x_train]).drop_duplicates(keep=False).dropna()
-        #data = data.loc[~data.index.isin(
-           # data.merge(x_train.assign(a='key'), how='left').dropna().index)]
+        data = data.loc[~data.index.isin(
+            data.merge(x_train.assign(a='key'), how='left').dropna().index)]
 
         return x_train, y_train, data
 
@@ -54,7 +53,7 @@ class optimizer:
         :rtype: model
         """
         kfold = KFold(n_splits=10, shuffle=True)
-        # regr = RandomForestRegressor()#25 100
+        #regr = RandomForestRegressor()#25 100
         regr = GradientBoostingRegressor()
         #regr = AdaBoostRegressor()
         #regr = SVR()
@@ -91,11 +90,10 @@ class optimizer:
         """
         pred = regr.predict(data)
         data['prediction'] = pred
-        
 
         best_combo = data.sort_values(by=['prediction'],
                                       ascending=False).iloc[:5]
-        best_combo = best_combo.drop('prediction',axis=1)
+        best_combo = best_combo.drop('prediction', axis=1)
 
         return best_combo
 
@@ -112,4 +110,56 @@ class optimizer:
         # Open the file in append & read mode ('a+')
         with open(training_file, "a+") as file_object:
             file_object.write(prev_parameters + '\n')
-            
+    
+    def categorical_feature_decoding(config: Dict, best_combo: list):
+        """This method converts encoded parameter list into decoded list.
+          Convert categorical veriable values back into its names.
+
+        :param config: Initial reaction feature configurations
+        :type config: Dict
+        :param best_combo: parameter list required for decoding
+        :type best_combo: list
+        :return: Decoded parameter list
+        :rtype: list
+        """
+        numerical_feature_count = len(config['continuous']['feature_names'])
+        numerical_combo = best_combo[0:numerical_feature_count]
+        cat_combo = best_combo[numerical_feature_count:]
+        print(cat_combo)
+        
+        
+        for i in range(len(cat_combo)):
+            x = config['categorical']['values'][i]
+            cat_combo[i] = x[int(cat_combo[i])]
+        
+        best_combo_with_names=[]
+        [best_combo_with_names.append(elem) for elem in numerical_combo]
+        [best_combo_with_names.append(elem) for elem in cat_combo]
+        return best_combo_with_names
+
+    def categorical_feature_encoding(config: Dict, prev_parameters: list):
+        """This method converts decoded parameter list into encoded list.
+          Convert categorical veriable values into its numerical values.
+
+        :param config: Initial reaction feature configurations
+        :type config: Dict
+        :param prev_parameters: parameter list required for encoding
+        :type prev_parameters: list
+        :return: encoded parameter list
+        :rtype: list
+        """
+        numerical_feature_count = len(config['continuous']['feature_names'])
+        numerical_combo = prev_parameters[0:numerical_feature_count]
+        cat_combo = prev_parameters[numerical_feature_count:]
+
+        for i in range(len(cat_combo)):
+            cat_list = config['categorical']['values'][i]
+            for x in range(len(cat_list)):
+                if cat_list[x] == cat_combo[i]:
+                   cat_combo[i] = x 
+        prev_parameters_encode=[]
+        [prev_parameters_encode.append(elem) for elem in numerical_combo]
+        [prev_parameters_encode.append(elem) for elem in cat_combo]
+        
+        return np.array(prev_parameters_encode)
+
