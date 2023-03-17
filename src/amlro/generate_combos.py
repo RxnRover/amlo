@@ -17,18 +17,14 @@ def validate_config(config: Dict) -> None:
     for bound in config["continuous"]["bounds"]:
         if bound[0] > bound[1]:
             msg = "Max bound must be greater than or equal to the min "
-            msg += "bound. Given bounds: Min = {}, Max = {}".format(
-                bound[0], bound[1]
-            )
+            msg += "bound. Given bounds: Min = {}, Max = {}".format(bound[0], bound[1])
             raise (ValueError(msg))
 
     # Check for invalid resolutions
     for resolution in config["continuous"]["resolutions"]:
         if resolution <= 0:
             msg = "Resolutions must all be positive, nonzero values. "
-            msg += "Given resolutions: {}".format(
-                config["continuous"]["resolutions"]
-            )
+            msg += "Given resolutions: {}".format(config["continuous"]["resolutions"])
             raise (ValueError(msg))
 
 
@@ -103,7 +99,7 @@ def _get_next_combo(
     return full_combo_list
 
 
-def generate_uniform_grid(config: Dict) -> List[List[float]]:
+def generate_uniform_grid(config: Dict) -> List[List[Any]]:
     """Genereting the parameter grid using the parameter bounds and their resolution.
 
     :param config: Dictionary of parameters, their bounds and resolution.
@@ -111,20 +107,26 @@ def generate_uniform_grid(config: Dict) -> List[List[float]]:
     :return: List of all the parameter combinations within bounds.
     :rtype: List[List[float]]
     """
+    import copy
 
-    validate_config(config)
+    tmp_config = copy.deepcopy(config)
+    validate_config(tmp_config)
 
     features = []
 
-    if "categorical" in config and len(config["categorical"]):
-        for i in range(len(config["categorical"]["feature_names"])):
-            config["continuous"]["feature_names"].append(config["categorical"]["feature_names"][i])
-            config["continuous"]["bounds"].append([0, len(config["categorical"]["values"][i]) - 1])
-            config["continuous"]["resolutions"].append(1)
+    if "categorical" in tmp_config and len(tmp_config["categorical"]):
+        for i in range(len(tmp_config["categorical"]["feature_names"])):
+            tmp_config["continuous"]["feature_names"].append(
+                tmp_config["categorical"]["feature_names"][i]
+            )
+            tmp_config["continuous"]["bounds"].append(
+                [0, len(tmp_config["categorical"]["values"][i]) - 1]
+            )
+            tmp_config["continuous"]["resolutions"].append(1)
 
-    for i in range(len(config["continuous"]["bounds"])):
-        lower_bound = config["continuous"]["bounds"][i][0]
-        upper_bound = config["continuous"]["bounds"][i][1]
+    for i in range(len(tmp_config["continuous"]["bounds"])):
+        lower_bound = tmp_config["continuous"]["bounds"][i][0]
+        upper_bound = tmp_config["continuous"]["bounds"][i][1]
 
         feature = []
 
@@ -136,7 +138,7 @@ def generate_uniform_grid(config: Dict) -> List[List[float]]:
         while next_value < upper_bound or math.isclose(next_value, upper_bound):
             feature.append(next_value)
 
-            next_value += config["continuous"]["resolutions"][i]
+            next_value += tmp_config["continuous"]["resolutions"][i]
 
         features.append(feature)
 

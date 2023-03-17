@@ -13,10 +13,10 @@ def main():
 
     parameters = [float(x) for x in parameters]
 
-    best_combo = get_optimized_parameters(training_dataset_path,
-                                          full_combo_path, parameters,
-                                          yield_val)
-    print('Optimized parameters ', best_combo)
+    best_combo = get_optimized_parameters(
+        training_dataset_path, full_combo_path, parameters, yield_val
+    )
+    print("Optimized parameters ", best_combo)
 
 
 def parse_args() -> argparse.Namespace:
@@ -27,23 +27,26 @@ def parse_args() -> argparse.Namespace:
     # Positional arguments
     parser.add_argument("training_file", help="Training dataset file path")
     parser.add_argument("full_combo_file", help="Full combination file path")
-    parser.add_argument("parameters",
-                        help="List of previous or initial parameters")
-    parser.add_argument("yield_val",
-                        help="Previous experimental value or initial zero")
+    parser.add_argument("parameters", help="List of previous or initial parameters")
+    parser.add_argument("yield_val", help="Previous experimental value or initial zero")
 
     return parser.parse_args()
 
 
-def get_optimized_parameters(training_dataset_path: str,
-                             full_combo_path: str,
-                             config: Dict,
-                             parameters=[],
-                             yield_val=0) -> List[float]:
+def get_optimized_parameters(
+    training_dataset_path: str,
+    training_dataset_decoded_path: str,
+    full_combo_path: str,
+    config: Dict,
+    parameters=[],
+    yield_val=0,
+) -> List[float]:
     """getting the best parameter set from the maching learning optimizer. 
     Initialy experimental yield and previous parameter set should be empty.
 
     :param training_dataset_path: file path to the training set file.
+    :type training_dataset_path: str
+    :param training_dataset_decoded_path: file path to the training set file with categorical feature names.
     :type training_dataset_path: str
     :param full_combo_path: path to the combination file.
     :type full_combo_path: str
@@ -56,34 +59,36 @@ def get_optimized_parameters(training_dataset_path: str,
     :return: best parameter combination for next experiment
     :rtype: List[float]
     """
-    parameters_encoded = optimizer.categorical_feature_encoding(config,parameters)
-    prev_parameters = ','.join([str(elem)
-                                for elem in parameters]) + ',' + str(yield_val)
-    prev_parameters_encoded = ','.join([str(elem)
-                                for elem in parameters_encoded]) + ',' + str(yield_val)
-    #here we can convert parameters in to parameters with cat names and write into new traning file with cat names.
-    if (len(parameters) != 0):
-        optimizer.write_data_to_training(training_dataset_path,
-                                         prev_parameters_encoded)
-        print('writting')
+    parameters_encoded = optimizer.categorical_feature_encoding(config, parameters)
+    prev_parameters = (
+        ",".join([str(elem) for elem in parameters]) + "," + str(yield_val)
+    )
+    prev_parameters_encoded = (
+        ",".join([str(elem) for elem in parameters_encoded]) + "," + str(yield_val)
+    )
+    # here we can convert parameters in to parameters with cat names and write into new traning file with cat names.
+    if len(parameters) != 0:
+        optimizer.write_data_to_training(training_dataset_path, prev_parameters_encoded)
+        optimizer.write_data_to_training(training_dataset_decoded_path, prev_parameters)
+        print("writting")
     ####################################################
-    x_train, y_train, data = optimizer.load_data(training_dataset_path,
-                                                 full_combo_path)
-    print('Data Loading for Machine Learning Model...')
-    
+    x_train, y_train, data = optimizer.load_data(training_dataset_path, full_combo_path)
+    print("Data Loading for Machine Learning Model...")
 
-    print('Training ML model...')
-    
+    print("Training ML model...")
+
     regr = optimizer.model_training(x_train, y_train)
     print(data.shape)
     best_combo = optimizer.predict_next_parameters(regr, data)
-    print('Searching for best reaction parameters...')
-    print('Best parameter combination...', best_combo[:1].values.tolist())
+    print("Searching for best reaction parameters...")
+    print("Best parameter combination...", best_combo[:1].values.tolist())
     #####################################################
 
-    print('Sending optmized parameters to Rxn Rover...')
-    #here we can convert best combo into best combo with cat names and return that too
-    best_combo = optimizer.categorical_feature_decoding(config, best_combo[:1].values.tolist())
+    print("Sending optmized parameters to Rxn Rover...")
+    # here we can convert best combo into best combo with cat names and return that too
+    best_combo = optimizer.categorical_feature_decoding(
+        config, best_combo[:1].values.tolist()
+    )
     return best_combo
 
 
