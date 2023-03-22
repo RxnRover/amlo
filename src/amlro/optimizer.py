@@ -128,7 +128,7 @@ def categorical_feature_decoding(config: Dict, best_combo: List[Any]) -> List[An
     for i in range(len(cat_combo)):
         x = config["categorical"]["values"][i]
         cat_combo[i] = x[int(cat_combo[i])]
-        print(cat_combo)
+       
 
     best_combo_with_names = []
     [best_combo_with_names.append(elem) for elem in numerical_combo]

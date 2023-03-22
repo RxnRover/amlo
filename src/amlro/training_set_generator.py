@@ -88,12 +88,12 @@ def generate_training_data(
 
         optimizer.write_data_to_training(training_dataset_path, prev_parameters_encoded)
         optimizer.write_data_to_training(training_dataset_decoded_path, prev_parameters)
-        print("writting")
+        print("Writting data to training dataset files...")
 
     data = load_training_combo_file(training_combo_path)
 
     data_decoded = optimizer.categorical_feature_decoding(config, data[itr])
-    print("data decoded", data_decoded)
+    
     return data_decoded
 
 
