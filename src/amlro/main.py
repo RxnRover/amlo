@@ -1,4 +1,4 @@
-from optimizer import optimizer
+from amlro.optimizer import optimizer
 import argparse
 from typing import List, Dict
 
@@ -69,7 +69,7 @@ def get_optimized_parameters(training_dataset_path: str,
     print('Training ML model...')
     regr = optimizer.model_training(x_train, y_train)
 
-    best_combo, data = optimizer.predict_next_parameters(regr, data)
+    best_combo = optimizer.predict_next_parameters(regr, data)
     print('Searching for best reaction parameters...')
     print('Best parameter combination...', best_combo[:1].values.tolist())
     #####################################################
