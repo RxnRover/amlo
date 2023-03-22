@@ -1,4 +1,4 @@
-from amlro.optimizer import optimizer
+import amlro.optimizer as optimizer
 import argparse
 from typing import List, Dict
 
@@ -70,11 +70,11 @@ def get_optimized_parameters(
     if len(parameters) != 0:
         optimizer.write_data_to_training(training_dataset_path, prev_parameters_encoded)
         optimizer.write_data_to_training(training_dataset_decoded_path, prev_parameters)
-        print("writting")
+        print("Writting data to training dataset files...")
     ####################################################
     x_train, y_train, data = optimizer.load_data(training_dataset_path, full_combo_path)
+    
     print("Data Loading for Machine Learning Model...")
-
     print("Training ML model...")
 
     regr = optimizer.model_training(x_train, y_train)

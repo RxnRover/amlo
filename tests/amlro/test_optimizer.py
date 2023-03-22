@@ -1,6 +1,6 @@
 import unittest
 
-from amlro.optimizer import optimizer
+import amlro.optimizer as optimizer
 
 
 class TestUniformGrid(unittest.TestCase):

@@ -1,4 +1,4 @@
-from amlro.optimizer import optimizer
+import amlro.optimizer as optimizer
 import pandas as pd
 import argparse
 from typing import List, Dict
