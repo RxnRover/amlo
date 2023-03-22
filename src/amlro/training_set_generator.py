@@ -93,7 +93,8 @@ def generate_training_data(
     data = load_training_combo_file(training_combo_path)
 
     data_decoded = optimizer.categorical_feature_decoding(config, data[itr])
-    
+    print("training  parameter combination...", data_decoded)
+
     return data_decoded
 
 

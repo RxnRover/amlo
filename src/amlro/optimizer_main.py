@@ -81,15 +81,16 @@ def get_optimized_parameters(
     print(data.shape)
     best_combo = optimizer.predict_next_parameters(regr, data)
     print("Searching for best reaction parameters...")
-    print("Best parameter combination...", best_combo[:1].values.tolist())
+    
     #####################################################
 
     print("Sending optmized parameters to Rxn Rover...")
     # here we can convert best combo into best combo with cat names and return that too
-    best_combo = optimizer.categorical_feature_decoding(
-        config, best_combo[:1].values.tolist()
+    best_combo_names = optimizer.categorical_feature_decoding(
+        config, best_combo[:1].values.tolist()[0]
     )
-    return best_combo
+    print("Best parameter combination...", best_combo_names)
+    return best_combo_names
 
 
 if __name__ == "__main__":
