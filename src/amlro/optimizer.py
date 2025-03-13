@@ -2,19 +2,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from sklearn.model_selection import KFold
+from sklearn.model_selection import ShuffleSplit
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import (
-    RandomForestRegressor,
     GradientBoostingRegressor,
-    AdaBoostRegressor,
 )
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.svm import SVR
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 import sklearn.metrics as metrics
-from typing import List, Dict, Tuple, Any
+from typing import List, Dict, Tuple, Any, Final
 
+SEED: Final[int] = 42
 
 #class Optimizer:
 def load_data(
@@ -57,22 +55,26 @@ def model_training(x_train: pd.DataFrame, y_train: pd.DataFrame):
     :return: trained regressor model
     :rtype: model
     """
-    kfold = KFold(n_splits=10, shuffle=True)
-    # regr = RandomForestRegressor()#25 100
-    regr = GradientBoostingRegressor()
-    # regr = AdaBoostRegressor()
-    # regr = SVR()
+    
+    
+    regr = GradientBoostingRegressor(random_state=SEED)
+    
+    estimators_int = list(range(100, 500, 50))
+    param_grid = {
+        "n_estimators": estimators_int,
+        "learning_rate": [0.01, 0.1, 0.2],
+        "max_depth": [None, 2, 4],
+    }
+    
+    kfold = ShuffleSplit(n_splits=10, test_size=0.2, random_state=SEED)
 
-    estimators_int = list(range(100, 1000, 50))
-    param_grid = {"n_estimators": estimators_int, "max_depth": [None, 2, 4]}
-    # param_grid = {'n_estimators': estimators_int, 'loss': ['linear','square', 'exponentia']}
-    # param_grid = {'kernel': ['linear','poly', 'rbf','sigmoid'], 'epsilon':[0.1,0.01,0.05]}
-    grid = GridSearchCV(estimator=regr, param_grid=param_grid, cv=kfold, n_jobs=6)
-
-    grid_result = grid.fit(x_train, y_train)
-    best_params = pd.DataFrame(
-        [grid.best_params_], columns=grid.best_params_.keys()
+    grid = GridSearchCV(
+        estimator=regr, param_grid=param_grid, cv=kfold, n_jobs=6
     )
+
+    grid.fit(x_train, y_train)
+    pd.DataFrame([grid.best_params_], columns=grid.best_params_.keys())
+    
     regr = grid.best_estimator_
 
     return regr
